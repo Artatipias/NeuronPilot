@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
 from ..schemas import user as user_schemas
+from .. import security  # Importáljuk a security modult
 
 # Create a new APIRouter instance
 # We can define a prefix and tags for all routes in this router
@@ -20,7 +21,7 @@ async def login_for_access_token():
     # Actual login logic will be implemented later
     return {"message": "Login endpoint placeholder"}
 
-# Updated registration endpoint
+# Updated registration endpoint with password hashing
 @router.post("/register", response_model=user_schemas.User)
 async def register_user(new_user: user_schemas.UserCreate):
     """
@@ -42,12 +43,13 @@ async def register_user(new_user: user_schemas.UserCreate):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
             )
-    # Simulate storing the user (we're not hashing password yet)
+    # Hash the password before "storing" it
+    hashed_password = security.get_password_hash(new_user.password)
     fake_users_db[user_id_counter] = {
         "id": user_id_counter,
         "username": new_user.username,
         "email": new_user.email,
-        "hashed_password": f"fake_hashed_{new_user.password}",
+        "hashed_password": hashed_password,  # Store the hashed password
         "is_active": True
     }
     # Return the created user data (without password, as per User schema)
