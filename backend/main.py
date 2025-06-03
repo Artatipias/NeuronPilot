@@ -1,7 +1,15 @@
 from fastapi import FastAPI
+from .routers import auth
 
-# Create an instance of the FastAPI class
-app = FastAPI()
+# Create an instance of the FastAPI class with metadata
+app = FastAPI(
+    title="NeuronPilot API",
+    description="Backend API for the NeuronPilot Intelligent System.",
+    version="0.1.0"
+)
+
+# Include the authentication router
+app.include_router(auth.router)
 
 # Define a GET endpoint at the root ("/") path
 @app.get("/")
